@@ -26,6 +26,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
+import re
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 @contextmanager
@@ -68,6 +69,29 @@ def application_train_test(num_rows = None, nan_as_category = False):
     df['PAYMENT_RATE'] = df['AMT_ANNUITY'] / df['AMT_CREDIT']
     del test_df
     gc.collect()
+    return df
+
+# Preprocess only application_train.csv
+def application_train(num_rows = None, nan_as_category = False):
+    # Read data and merge
+    df = pd.read_csv('../input/application_train.csv', nrows= num_rows)
+    # Optional: Remove 4 applications with XNA CODE_GENDER (train set)
+    df = df[df['CODE_GENDER'] != 'XNA']
+    
+    # Categorical features with Binary encode (0 or 1; two categories)
+    for bin_feature in ['CODE_GENDER', 'FLAG_OWN_CAR', 'FLAG_OWN_REALTY']:
+        df[bin_feature], uniques = pd.factorize(df[bin_feature])
+    # Categorical features with One-Hot encode
+    df, cat_cols = one_hot_encoder(df, nan_as_category)
+    
+    # NaN values for DAYS_EMPLOYED: 365.243 -> nan
+    df['DAYS_EMPLOYED'].replace(365243, np.nan, inplace= True)
+    # Some simple new features (percentages)
+    df['DAYS_EMPLOYED_PERC'] = df['DAYS_EMPLOYED'] / df['DAYS_BIRTH']
+    df['INCOME_CREDIT_PERC'] = df['AMT_INCOME_TOTAL'] / df['AMT_CREDIT']
+    df['INCOME_PER_PERSON'] = df['AMT_INCOME_TOTAL'] / df['CNT_FAM_MEMBERS']
+    df['ANNUITY_INCOME_PERC'] = df['AMT_ANNUITY'] / df['AMT_INCOME_TOTAL']
+    df['PAYMENT_RATE'] = df['AMT_ANNUITY'] / df['AMT_CREDIT']
     return df
 
 # Preprocess bureau.csv and bureau_balance.csv
@@ -315,10 +339,9 @@ def display_importances(feature_importance_df_):
     plt.tight_layout()
     plt.savefig('lgbm_importances01.png')
 
-
-def main(debug = False):
+def get_feature_engineered_result(debug = False):
     num_rows = 10000 if debug else None
-    df = application_train_test(num_rows)
+    df = application_train(num_rows)
     with timer("Process bureau and bureau_balance"):
         bureau = bureau_and_balance(num_rows)
         print("Bureau df shape:", bureau.shape)
@@ -350,6 +373,46 @@ def main(debug = False):
         del cc
         gc.collect()
     with timer("Run LightGBM with kfold"):
+        #Adding this to debug a problem with utf8
+        df = df.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
+    return df
+
+def main(debug = False):
+    num_rows = 10000 if debug else None
+    df = application_train(num_rows)
+    with timer("Process bureau and bureau_balance"):
+        bureau = bureau_and_balance(num_rows)
+        print("Bureau df shape:", bureau.shape)
+        df = df.join(bureau, how='left', on='SK_ID_CURR')
+        del bureau
+        gc.collect()
+    with timer("Process previous_applications"):
+        prev = previous_applications(num_rows)
+        print("Previous applications df shape:", prev.shape)
+        df = df.join(prev, how='left', on='SK_ID_CURR')
+        del prev
+        gc.collect()
+    with timer("Process POS-CASH balance"):
+        pos = pos_cash(num_rows)
+        print("Pos-cash balance df shape:", pos.shape)
+        df = df.join(pos, how='left', on='SK_ID_CURR')
+        del pos
+        gc.collect()
+    with timer("Process installments payments"):
+        ins = installments_payments(num_rows)
+        print("Installments payments df shape:", ins.shape)
+        df = df.join(ins, how='left', on='SK_ID_CURR')
+        del ins
+        gc.collect()
+    with timer("Process credit card balance"):
+        cc = credit_card_balance(num_rows)
+        print("Credit card balance df shape:", cc.shape)
+        df = df.join(cc, how='left', on='SK_ID_CURR')
+        del cc
+        gc.collect()
+    with timer("Run LightGBM with kfold"):
+        #Adding this to debug a problem with utf8
+        df = df.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
         feat_importance = kfold_lightgbm(df, num_folds= 10, stratified= False, debug= debug)
 
 if __name__ == "__main__":
