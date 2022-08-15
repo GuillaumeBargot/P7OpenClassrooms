@@ -11,7 +11,7 @@ app = FastAPI()
 
 model = joblib.load('model.joblib')
 clean_data = pd.read_csv('notebooks/clean_data.csv')
-X = clean_data.drop(columns=['TARGET'])
+X = clean_data.drop('TARGET', axis=1)
 
 # 3. Index route, opens automatically on http://127.0.0.1:8000
 @app.get('/')
