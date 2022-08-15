@@ -5,13 +5,14 @@ import joblib
 import re
 from lightgbm import LGBMClassifier
 import pandas as pd
+import logging
 
 # 2. Create the app object
 app = FastAPI()
 
 model = joblib.load('model.joblib')
 clean_data = pd.read_csv('notebooks/clean_data.csv')
-print(X.head())
+logging.warning(X.head())
 X = clean_data.drop('TARGET', axis=1)
 
 # 3. Index route, opens automatically on http://127.0.0.1:8000
