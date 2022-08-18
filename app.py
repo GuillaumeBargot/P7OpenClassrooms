@@ -14,10 +14,11 @@ app = FastAPI()
 
 def get_clean_data():
     clean_datas = []
-    for i in range(1,10):
-        clean_datas.append(pd.read_csv('notebooks/clean_data' + str(i) + '.csv'))
-        logging.warning("PDCONCAT" + clean_datas[len(clean_datas)-1].columns)
-    return pd.concat(clean_datas, ignore_index=True)
+    #for i in range(1,10):
+     #   clean_datas.append(pd.read_csv('notebooks/clean_data' + str(i) + '.csv'))
+      #  logging.warning("PDCONCAT" + clean_datas[len(clean_datas)-1].columns)
+    #return pd.concat(clean_datas, ignore_index=True)
+    return pd.read_csv('https://github.com/GuillaumeBargot/P7OpenClassrooms/blob/main/notebooks/clean_data.csv')
 
 model = joblib.load('model.joblib')
 clean_data = get_clean_data()
