@@ -16,7 +16,7 @@ def get_clean_data(online):
     clean_datas = []
     url1 = 'https://media.githubusercontent.com/media/GuillaumeBargot/P7OpenClassrooms/main/notebooks/clean_data'
     url2 = '.csv'
-    for i in range(1,10):
+    for i in range(1,4):
         file = ""
         if(online):
             file = url1 + str(i) + url2
