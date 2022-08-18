@@ -1,4 +1,6 @@
 # 1. Library imports
+from array import array
+from itertools import product
 import uvicorn
 from fastapi import FastAPI
 import joblib
@@ -10,8 +12,14 @@ import logging
 # 2. Create the app object
 app = FastAPI()
 
+def get_clean_data():
+    clean_datas = []
+    for i in range(1,10):
+        clean_datas.append(pd.read_csv('notebooks/clean_data' + i))
+    return pd.concat(clean_datas)
+
 model = joblib.load('model.joblib')
-clean_data = pd.read_csv('notebooks/clean_data.csv')
+clean_data = get_clean_data()
 logging.warning(clean_data.columns)
 X = clean_data.drop('TARGET', axis=1)
 
@@ -34,3 +42,6 @@ def actualy_predict(sk_id: int):
 #    Will run on http://127.0.0.1:8000
 if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8000)
+
+
+
