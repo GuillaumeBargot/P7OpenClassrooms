@@ -12,17 +12,23 @@ import logging
 # 2. Create the app object
 app = FastAPI()
 
-def get_clean_data():
+def get_clean_data(online):
     clean_datas = []
     url1 = 'https://github.com/GuillaumeBargot/P7OpenClassrooms/blob/main/notebooks/clean_data'
     url2 = '.csv'
     for i in range(1,10):
-        clean_datas.append(pd.read_csv(url1 + str(i) + url2))
+        file = ""
+        if(online):
+            file = url1 + str(i) + url2
+        else:
+            file = "notebooks/clean_data" + str(i) + ".csv"
+            logging.warning("FILE = " + file)
+        clean_datas.append(file)
         logging.warning("PDCONCAT" + clean_datas[len(clean_datas)-1].columns)
     return pd.concat(clean_datas, ignore_index=True)
 
 model = joblib.load('model.joblib')
-clean_data = get_clean_data()
+clean_data = get_clean_data(False)
 logging.warning(clean_data.columns)
 X = clean_data.drop('TARGET', axis=1)
 
