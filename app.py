@@ -16,7 +16,7 @@ def get_clean_data():
     clean_datas = []
     for i in range(1,10):
         clean_datas.append(pd.read_csv('notebooks/clean_data' + i))
-    return pd.concat(clean_datas)
+    return pd.concat(clean_datas, ignore_index=True)
 
 model = joblib.load('model.joblib')
 clean_data = get_clean_data()
