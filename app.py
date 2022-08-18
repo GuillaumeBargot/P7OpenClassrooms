@@ -23,7 +23,7 @@ def get_clean_data(online):
         else:
             file = "notebooks/clean_data" + str(i) + ".csv"
             logging.warning("FILE = " + file)
-        clean_datas.append(file)
+        clean_datas.append(pd.read_csv(file))
         logging.warning("PDCONCAT" + clean_datas[len(clean_datas)-1].columns)
     return pd.concat(clean_datas, ignore_index=True)
 
