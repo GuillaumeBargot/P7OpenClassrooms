@@ -14,7 +14,7 @@ app = FastAPI()
 
 def get_clean_data(online):
     clean_datas = []
-    url1 = 'https://github.com/GuillaumeBargot/P7OpenClassrooms/blob/main/notebooks/clean_data'
+    url1 = 'https://media.githubusercontent.com/media/GuillaumeBargot/P7OpenClassrooms/main/notebooks/clean_data'
     url2 = '.csv'
     for i in range(1,10):
         file = ""
@@ -28,7 +28,7 @@ def get_clean_data(online):
     return pd.concat(clean_datas, ignore_index=True)
 
 model = joblib.load('model.joblib')
-clean_data = get_clean_data(False)
+clean_data = get_clean_data(True)
 logging.warning(clean_data.columns)
 X = clean_data.drop('TARGET', axis=1)
 
