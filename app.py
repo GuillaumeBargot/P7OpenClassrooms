@@ -27,8 +27,15 @@ def get_clean_data(online):
         logging.warning("PDCONCAT" + clean_datas[len(clean_datas)-1].columns)
     return pd.concat(clean_datas, ignore_index=True)
 
+def get_zip_data():
+    url = 'https://media.githubusercontent.com/media/GuillaumeBargot/P7OpenClassrooms/main/notebooks/clean_data.zip'
+    clean_data = pd.read_csv(url,compression='zip')
+    logging.warning('UNZIPPING ? ' + clean_data.head().to_string())
+    return clean_data
+
 model = joblib.load('model.joblib')
-clean_data = get_clean_data(True)
+#clean_data = get_clean_data(True)
+clean_data = get_zip_data()
 logging.warning(clean_data.columns)
 X = clean_data.drop('TARGET', axis=1)
 
