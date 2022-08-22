@@ -40,7 +40,6 @@ model = joblib.load('model.joblib')
 #clean_data = get_clean_data(True)
 logging.warning('BEFORE even calling get zip data')
 clean_data = get_zip_data()
-logging.warning(clean_data.columns)
 X = clean_data.drop('TARGET', axis=1)
 logging.warning('After X')
 del clean_data
