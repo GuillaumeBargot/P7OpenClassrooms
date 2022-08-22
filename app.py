@@ -28,7 +28,8 @@ def get_clean_data(online):
     return pd.concat(clean_datas, ignore_index=True)
 
 def get_zip_data():
-    url = 'https://github.com/GuillaumeBargot/P7OpenClassrooms/blob/main/notebooks/clean_data.zip'
+    url = 'notebooks/clean_data.zip'
+    #'https://github.com/GuillaumeBargot/P7OpenClassrooms/blob/main/notebooks/clean_data.zip'
     clean_data = pd.read_csv(url,compression='zip')
     logging.warning('UNZIPPING ? ' + clean_data.head().to_string())
     return clean_data
