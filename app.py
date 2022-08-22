@@ -4,10 +4,11 @@ from itertools import product
 import uvicorn
 from fastapi import FastAPI
 import joblib
-import re
 from lightgbm import LGBMClassifier
 import pandas as pd
 import logging
+import streamlit as st
+
 
 # 2. Create the app object
 app = FastAPI()
@@ -53,6 +54,9 @@ def index():
 @app.get('/predict/{sk_id}')
 async def predict(sk_id: int):
     prob = actualy_predict(sk_id)
+    st.write("""
+    # Model, below is my predictions
+    # """)
     return {'message': str(prob)}
 
 def actualy_predict(sk_id: int):
