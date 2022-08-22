@@ -32,7 +32,7 @@ def get_zip_data():
     #'https://github.com/GuillaumeBargot/P7OpenClassrooms/blob/main/notebooks/clean_data.zip'
     logging.warning("UNZIPPING before the pd.read line")
     clean_data = pd.read_csv(url,compression='zip')
-    logging.warning('UNZIPPING ? ' + clean_data.head().to_string())
+    logging.warning('UNZIPPING worked')
     return clean_data
 
 model = joblib.load('model.joblib')
@@ -41,6 +41,9 @@ logging.warning('BEFORE even calling get zip data')
 clean_data = get_zip_data()
 logging.warning(clean_data.columns)
 X = clean_data.drop('TARGET', axis=1)
+logging.warning('After X')
+del clean_data
+logging.warning('After deleting clean data')
 
 # 3. Index route, opens automatically on http://127.0.0.1:8000
 @app.get('/')
