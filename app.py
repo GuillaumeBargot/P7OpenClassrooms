@@ -6,8 +6,6 @@ from fastapi import FastAPI
 import joblib
 from lightgbm import LGBMClassifier
 import pandas as pd
-import logging
-#import streamlit as st
 
 
 # 2. Create the app object
@@ -23,27 +21,18 @@ def get_clean_data(online):
             file = url1 + str(i) + url2
         else:
             file = "notebooks/clean_data" + str(i) + ".csv"
-            logging.warning("FILE = " + file)
         clean_datas.append(pd.read_csv(file))
-        logging.warning("PDCONCAT" + clean_datas[len(clean_datas)-1].columns)
     return pd.concat(clean_datas, ignore_index=True)
 
 def get_zip_data():
     url = 'notebooks/clean_data1.zip'
-    #'https://github.com/GuillaumeBargot/P7OpenClassrooms/blob/main/notebooks/clean_data.zip'
-    logging.warning("UNZIPPING before the pd.read line")
     clean_data = pd.read_csv(url,compression='zip')
-    logging.warning('UNZIPPING worked')
     return clean_data
 
 model = joblib.load('model.joblib')
-#clean_data = get_clean_data(True)
-logging.warning('BEFORE even calling get zip data')
 clean_data = get_zip_data()
 X = clean_data.drop('TARGET', axis=1)
-logging.warning('After X')
 del clean_data
-logging.warning('After deleting clean data')
 
 # 3. Index route, opens automatically on http://127.0.0.1:8000
 @app.get('/')
@@ -53,9 +42,6 @@ def index():
 @app.get('/predict/{sk_id}')
 async def predict(sk_id: int):
     prob = actualy_predict(sk_id)
-    #st.write("""
-    # Model, below is my predictions
-    # """)
     return {'message': str(prob)}
 
 def actualy_predict(sk_id: int):
